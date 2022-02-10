@@ -2,7 +2,7 @@ from typing import Generator
 import mnist
 import numpy as np
 import matplotlib.pyplot as plt
-
+from random import shuffle as shuffle_func
 
 def batch_loader(
         X: np.ndarray, Y: np.ndarray,
@@ -25,7 +25,9 @@ def batch_loader(
         num_batches = int(np.ceil(len(X) / batch_size))
     indices = list(range(len(X)))
 
-    # TODO (copy from last assignment) implement dataset shuffling here.
+
+    if shuffle:
+        shuffle_func(indices)
 
     for i in range(num_batches):
         # select a set of indices for each batch of samples
