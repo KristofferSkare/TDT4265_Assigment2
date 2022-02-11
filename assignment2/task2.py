@@ -15,10 +15,14 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: SoftmaxModel) 
     Returns:
         Accuracy (float)
     """
-    # TODO: Implement this function (copy from last assignment)
-    accuracy = 0
+    batch_size = np.size(X, 0)
+    outputs = model.forward(X)
+    pred = np.argmax(outputs, axis=1)
+    label = np.argmax(targets, axis=1)
+    correct = (np.abs(pred - label) < 0.0001).astype(int).sum()
+    
+    accuracy = correct / batch_size
     return accuracy
-
 
 class SoftmaxTrainer(BaseTrainer):
 
@@ -32,7 +36,7 @@ class SoftmaxTrainer(BaseTrainer):
         self.momentum_gamma = momentum_gamma
         self.use_momentum = use_momentum
         # Init a history of previous gradients to use for implementing momentum
-        self.previous_grads = [np.zeros_like(w) for w in self.model.ws]
+        self.previous_grads = [[np.zeros_like(w) for w in self.model.ws]]
 
     def train_step(self, X_batch: np.ndarray, Y_batch: np.ndarray):
         """
@@ -47,10 +51,20 @@ class SoftmaxTrainer(BaseTrainer):
             loss value (float) on batch
         """
         # TODO: Implement this function (task 2c)
+        output = self.model.forward(X_batch)
+        self.model.backward(X_batch, output, Y_batch)
+        if self.use_momentum:
+            delta_w_prev = self.previous_grads[-1]
+            delta_w = [self.momentum_gamma * delta_w_prev[i] + self.model.grads[i] for i in range(len(delta_w_prev))]
+            self.previous_grads.append(delta_w)
 
-        loss = 0
+            self.model.ws = [self.model.ws[i] - self.learning_rate * delta_w[i] for i in range(len(delta_w))]
 
-        loss = cross_entropy_loss(Y_batch, logits)  # sol
+        else:
+            self.model.ws = [self.model.ws[i] - self.learning_rate * self.model.grads[i] for i in range(len(self.model.ws))]
+
+        
+        loss = cross_entropy_loss(Y_batch, output)
 
         return loss
 
