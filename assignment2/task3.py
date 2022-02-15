@@ -24,7 +24,7 @@ if __name__ == "__main__":
     Y_train = one_hot_encode(Y_train, 10)
     Y_val = one_hot_encode(Y_val, 10)
 
-    tests = [[True, False, False], [False, True, False], [False, False, True], [True, True, True]]
+    tests = [[True, False, False], [False, True, False], [False, False, True], [True, True, True], [False, True, True]]
     loss_histories = []
     acc_histories = []
     for test in tests:
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         loss_histories.append({"train": train_history["loss"], "val": val_history["loss"]})
         acc_histories.append({"train": train_history["accuracy"], "val": val_history["accuracy"]})
 
-    test_titles = ["Improved sigmoid", "Improved weight initialization", "Momentum", "Using all together"]
+    test_titles = ["Improved sigmoid", "Improved weight initialization", "Momentum", "Using all together", "Momentum and improved weight initialization"]
     for i in range(len(tests)):
         plt.suptitle(test_titles[i])
         plt.subplot(1, 2, 1)

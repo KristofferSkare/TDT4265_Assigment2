@@ -93,22 +93,22 @@ class SoftmaxModel:
 
         a_prev = X
         batch_size = X.shape[0]
-        zs = []
+        outputs = []
         for i, w in enumerate(self.ws):
-            z = np.matmul(a_prev,w)
+            z = np.matmul(a_prev, w)
             if i == len(self.ws) -1:
                 exp_zk = np.exp(z)
                 exp_sum = exp_zk.sum(axis=1, keepdims=True)
                 a = exp_zk / exp_sum
             else:
-                zs.append(z)
                 if self.use_improved_sigmoid:
                     a = 1.7159 * np.tanh(2/3 * z)
                 else:
                     a = 1/(1 + np.exp(-z))
+                outputs.append(a)
             a_prev = np.hstack((a, np.ones((batch_size ,1))))
         
-        self.hidden_layer_output = zs
+        self.hidden_layer_output = outputs
         return a
 
     def backward(self, X: np.ndarray, outputs: np.ndarray,
@@ -125,22 +125,22 @@ class SoftmaxModel:
         assert targets.shape == outputs.shape,\
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
 
+
         delta = -(targets - outputs)
         batch_size = X.shape[0]
-        zs = self.hidden_layer_output
+        a_s = self.hidden_layer_output
         grads = []
         for i, w in reversed(list(enumerate(self.ws))):
             if i == 0:
                 hidden_layer_with_bias = X
             else:
-                z = zs[i - 1]
+                a = a_s[i - 1]
                 if self.use_improved_sigmoid:
-                    #TODO: Improved sigmoid does not work
-                    a = 1.7159 * np.tanh(2/3 * z)
-                    sigmoid_derivative = 1.14383/((np.cosh(z))**2)
+                    tanh_scale = 1.7159
+                    
+                    sigmoid_derivative = (tanh_scale**2 - a**2) * 2/3 / tanh_scale
                 else: 
-                    a = 1/(1 + np.exp(-z))
-                    sigmoid_derivative =a * (1- a)
+                    sigmoid_derivative = a * (1- a)
                 hidden_layer_with_bias = np.hstack((a, np.ones((batch_size,1))))
 
             grad = 1/np.size(targets, 0) * np.matmul(hidden_layer_with_bias.T, delta)
