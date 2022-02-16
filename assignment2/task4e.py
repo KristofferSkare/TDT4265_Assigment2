@@ -23,7 +23,8 @@ if __name__ == "__main__":
     Y_train = one_hot_encode(Y_train, 10)
     Y_val = one_hot_encode(Y_val, 10)
     # TODO: Some of the plots needs to be changed before running with 50 epochs, check assignment text
-    network_topologies = [[32, 10],[128,10], [60, 60, 10]] #[*([64]*10), 10] ]
+    network_topologies = [[64, 10],[*([64]*10), 10]]
+    settings = [[]]
     loss_histories = []
     acc_histories = []
     for neurons_per_layer in network_topologies:
@@ -42,23 +43,26 @@ if __name__ == "__main__":
         loss_histories.append({"train": train_history["loss"], "val": val_history["loss"]})
         acc_histories.append({"train": train_history["accuracy"], "val": val_history["accuracy"]})
         print("Training ", str(neurons_per_layer), " done")
-
+    
+    plt.suptitle("Loss: 1 hidden layer vs 10 hidden layers")
+    runs= [" (1 hidden layer)", " (10 hidden layers)"]
     for i in range(len(network_topologies)):
-        plt.suptitle(str(network_topologies[i]))
-        plt.subplot(1, 2, 1)
-        plt.ylim((0,0.4))
         utils.plot_loss(loss_histories[i]["train"],
-                        "Training loss", npoints_to_average=10)
+                        "Train" + runs[i], npoints_to_average=10)
+    for i in range(len(network_topologies)):
         utils.plot_loss(
-            loss_histories[i]["val"], "Validation loss")
+            loss_histories[i]["val"], "Val"  + runs[i])
         plt.legend()
-        plt.subplot(1, 2, 2)
-        plt.ylim((0.9,1))
-        utils.plot_loss(acc_histories[i]["train"], "Training accuracy")
+    plt.savefig("task4e_loss.png") 
+    plt.clf()
+
+    plt.suptitle("Accuracy: 1 hidden layer vs 10 hidden layers")
+    for i in range(len(network_topologies)):
+        utils.plot_loss(acc_histories[i]["train"], "Train"  + runs[i])
+    for i in range(len(network_topologies)):
         utils.plot_loss(
-            acc_histories[i]["val"], "Validation accuracy")
-        plt.ylabel("Validation Accuracy")
+            acc_histories[i]["val"], "Val"  + runs[i])
         plt.legend()
-        plt.savefig("task4_" + str(network_topologies[i]) + ".png")
-        plt.clf()
+
+    plt.savefig("task4e_accuracy.png") 
        
