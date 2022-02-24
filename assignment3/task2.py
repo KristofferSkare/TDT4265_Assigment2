@@ -122,7 +122,7 @@ def main():
         dataloaders
     )
     trainer.train()
-    create_plots(trainer, "task2")
+    create_plots(trainer, "task3_1")
 
 if __name__ == "__main__":
     main()
