@@ -1,9 +1,11 @@
 import pathlib
 import matplotlib.pyplot as plt
+import torch
 import utils
 from torch import nn
 from dataloaders import load_cifar10
 from trainer import Trainer
+import numpy as np
 
 
 class ExampleModel(nn.Module):
@@ -18,28 +20,52 @@ class ExampleModel(nn.Module):
                 num_classes: Number of classes we want to predict (10)
         """
         super().__init__()
+
+        input_image_size = 32 * 32
         # TODO: Implement this function (Task  2a)
-        num_filters = 32  # Set number of filters in first conv layer
+        num_conv_filters = [32, 64, 128]  # Set number of filters in first conv layer
+        fully_hidden_layers = [64]
+
         self.num_classes = num_classes
         # Define the convolutional layers
-        self.feature_extractor = nn.Sequential(
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=num_filters,
-                kernel_size=5,
-                stride=1,
-                padding=2
+        layer_depth = image_channels
+
+        conv_layers = []
+        for num_filters in num_conv_filters:
+            conv_layers.append(
+                nn.Conv2d(
+                    in_channels=layer_depth,
+                    out_channels=num_filters,
+                    kernel_size=5,
+                    stride=1,
+                    padding=2
+                )
             )
-        )
-        # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 32*32*32
+            conv_layers.append(nn.ReLU())
+            conv_layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+            layer_depth = num_filters
+
+        self.feature_extractor = nn.Sequential(*conv_layers)
+
+        num_flattened_nodes = int(np.floor(input_image_size / 4**(len(num_conv_filters)) * layer_depth))
+
+        hidden_layers = []
+        num_input_nodes = num_flattened_nodes
+        for num_nodes in fully_hidden_layers:
+            hidden_layers.append(nn.Linear(num_input_nodes, num_nodes))
+            hidden_layers.append(nn.ReLU())
+            num_input_nodes = num_nodes
+
+        self.num_output_features = num_flattened_nodes
         # Initialize our last fully connected layer
         # Inputs all extracted features from the convolutional layers
         # Outputs num_classes predictions, 1 for each class.
         # There is no need for softmax activation function, as this is
         # included with nn.CrossEntropyLoss
         self.classifier = nn.Sequential(
-            nn.Linear(self.num_output_features, num_classes),
+            nn.Flatten(start_dim=1),
+            *hidden_layers, 
+            nn.Linear(fully_hidden_layers[-1], num_classes)
         )
 
     def forward(self, x):
@@ -50,8 +76,10 @@ class ExampleModel(nn.Module):
         """
         # TODO: Implement this function (Task  2a)
         batch_size = x.shape[0]
-        out = x
         expected_shape = (batch_size, self.num_classes)
+
+        out = self.classifier(self.feature_extractor(x))
+
         assert out.shape == (batch_size, self.num_classes),\
             f"Expected output of forward pass to be: {expected_shape}, but got: {out.shape}"
         return out

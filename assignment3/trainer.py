@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import typing
 import time
@@ -21,8 +22,11 @@ def compute_loss_and_accuracy(
         [average_loss, accuracy]: both scalar.
     """
     average_loss = 0
+    losses = []
     accuracy = 0
-    # TODO: Implement this function (Task  2a)
+    num_correct = 0
+    num_total = 0
+
     with torch.no_grad():
         for (X_batch, Y_batch) in dataloader:
             # Transfer images/labels to GPU VRAM, if possible
@@ -30,8 +34,15 @@ def compute_loss_and_accuracy(
             Y_batch = utils.to_cuda(Y_batch)
             # Forward pass the images through our model
             output_probs = model(X_batch)
-
+            guesses = np.argmax(output_probs, axis=1)
+            correct = np.asarray(torch.eq(guesses, Y_batch))
+            num_correct += correct.astype(int).sum()
+            num_total += len(Y_batch)
+            losses.append(loss_criterion(output_probs, Y_batch))
             # Compute Loss and Accuracy
+
+    accuracy = num_correct / num_total
+    average_loss = np.mean(np.array(losses))
 
     return average_loss, accuracy
 
