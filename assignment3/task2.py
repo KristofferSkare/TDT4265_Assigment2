@@ -12,7 +12,15 @@ class ExampleModel(nn.Module):
 
     def __init__(self,
                  image_channels,
-                 num_classes):
+                 num_classes,
+                 convolutional_layers=[32,64,128],
+                hidden_linear_layers=[64],
+                kernels = [{"size": 5, "stride": 1, "padding": 2}]*3,
+                pooling = [{"size": 2, "stride": 2}]*3,
+                input_image_size=32*32,
+                batch_normalization=False,
+                activation_function=nn.ReLU(),
+    ):          
         """
             Is called when model is initialized.
             Args:
@@ -21,39 +29,36 @@ class ExampleModel(nn.Module):
         """
         super().__init__()
 
-        input_image_size = 32 * 32
-        # TODO: Implement this function (Task  2a)
-        num_conv_filters = [32, 64, 128]  # Set number of filters in first conv layer
-        fully_hidden_layers = [64]
-
         self.num_classes = num_classes
         # Define the convolutional layers
         layer_depth = image_channels
 
         conv_layers = []
-        for num_filters in num_conv_filters:
+        for i, num_filters in enumerate(convolutional_layers):
             conv_layers.append(
                 nn.Conv2d(
                     in_channels=layer_depth,
                     out_channels=num_filters,
-                    kernel_size=5,
-                    stride=1,
-                    padding=2
+                    kernel_size=kernels[i]["size"],
+                    stride=kernels[i]["stride"],
+                    padding=kernels[i]["padding"]
                 )
             )
-            conv_layers.append(nn.ReLU())
-            conv_layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+            input_image_size -= 0 # TODO: Calculate new input image size
+            conv_layers.append(activation_function)
+            conv_layers.append(nn.MaxPool2d(kernel_size=pooling[i]["size"], stride=pooling[i]["stride"]))
+            input_image_size /= pooling
             layer_depth = num_filters
 
         self.feature_extractor = nn.Sequential(*conv_layers)
 
-        num_flattened_nodes = int(np.floor(input_image_size / 4**(len(num_conv_filters)) * layer_depth))
+        num_flattened_nodes = int(input_image_size * layer_depth)
 
         hidden_layers = []
         num_input_nodes = num_flattened_nodes
-        for num_nodes in fully_hidden_layers:
+        for num_nodes in hidden_linear_layers:
             hidden_layers.append(nn.Linear(num_input_nodes, num_nodes))
-            hidden_layers.append(nn.ReLU())
+            hidden_layers.append(activation_function)
             num_input_nodes = num_nodes
 
         self.num_output_features = num_flattened_nodes
@@ -65,7 +70,7 @@ class ExampleModel(nn.Module):
         self.classifier = nn.Sequential(
             nn.Flatten(start_dim=1),
             *hidden_layers, 
-            nn.Linear(fully_hidden_layers[-1], num_classes)
+            nn.Linear(hidden_linear_layers[-1], num_classes)
         )
 
     def forward(self, x):

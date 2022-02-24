@@ -73,8 +73,10 @@ class Trainer:
         print(self.model)
 
         # Define our optimizer. SGD = Stochastich Gradient Descent
+        # TODO: test out different optim?
+        # TODO: Test with L2-reg (weight decay) and momentum
         self.optimizer = torch.optim.SGD(self.model.parameters(),
-                                         self.learning_rate)
+                                         self.learning_rate, momentum=0, weight_decay=0)
 
         # Load our dataset
         self.dataloader_train, self.dataloader_val, self.dataloader_test = dataloaders
