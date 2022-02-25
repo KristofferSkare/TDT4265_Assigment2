@@ -26,7 +26,6 @@ def compute_loss_and_accuracy(
     accuracy = 0
     num_correct = 0
     num_total = 0
-
     with torch.no_grad():
         for (X_batch, Y_batch) in dataloader:
             # Transfer images/labels to GPU VRAM, if possible

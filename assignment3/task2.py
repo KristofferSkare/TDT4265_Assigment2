@@ -7,6 +7,14 @@ from dataloaders import load_cifar10
 from trainer import Trainer
 import numpy as np
 
+def new_shape_after_convolution_or_pooling(image_shape, kernel_size, stride, padding=0):
+    dilation = 1
+    width, height = image_shape
+
+    width = np.floor((width - dilation*(kernel_size - 1) + 2*padding - 1)/stride + 1)
+    height = np.floor((height - dilation*(kernel_size - 1) + 2*padding - 1)/stride + 1)
+
+    return (width, height)
 
 class ExampleModel(nn.Module):
 
@@ -14,13 +22,12 @@ class ExampleModel(nn.Module):
                  image_channels,
                  num_classes,
                  convolutional_layers=[32,64,128],
-                hidden_linear_layers=[64],
-                kernels = [{"size": 5, "stride": 1, "padding": 2}]*3,
-                pooling = [{"size": 2, "stride": 2}]*3,
-                input_image_size=32*32,
-                batch_normalization=False,
-                activation_function=nn.ReLU(),
-    ):          
+                 hidden_linear_layers=[64],
+                 kernels = [{"size": 5, "stride": 1, "padding": 2}]*3,
+                 pooling = [{"size": 2, "stride": 2}]*3,
+                 input_image_shape=(32,32),
+                 batch_normalization=False,
+                 activation_function=nn.ReLU()):          
         """
             Is called when model is initialized.
             Args:
@@ -33,6 +40,8 @@ class ExampleModel(nn.Module):
         # Define the convolutional layers
         layer_depth = image_channels
 
+        image_shape = input_image_shape
+
         conv_layers = []
         for i, num_filters in enumerate(convolutional_layers):
             conv_layers.append(
@@ -44,15 +53,23 @@ class ExampleModel(nn.Module):
                     padding=kernels[i]["padding"]
                 )
             )
-            input_image_size -= 0 # TODO: Calculate new input image size
+            image_shape = new_shape_after_convolution_or_pooling(image_shape, kernels[i]["size"], kernels[i]["stride"], kernels[i]["padding"])
+            
             conv_layers.append(activation_function)
+            
             conv_layers.append(nn.MaxPool2d(kernel_size=pooling[i]["size"], stride=pooling[i]["stride"]))
-            input_image_size /= pooling
+
+
+            image_shape = new_shape_after_convolution_or_pooling(image_shape, pooling[i]["size"], pooling[i]["stride"])
+            
+            if (batch_normalization):
+                conv_layers.append(nn.BatchNorm2d(num_filters))
+
             layer_depth = num_filters
 
         self.feature_extractor = nn.Sequential(*conv_layers)
 
-        num_flattened_nodes = int(input_image_size * layer_depth)
+        num_flattened_nodes = int(image_shape[0] * image_shape[1] * layer_depth)
 
         hidden_layers = []
         num_input_nodes = num_flattened_nodes
@@ -117,7 +134,14 @@ def main():
     learning_rate = 5e-2
     early_stop_count = 4
     dataloaders = load_cifar10(batch_size)
-    model = ExampleModel(image_channels=3, num_classes=10)
+    model = ExampleModel(
+        image_channels=3, 
+        num_classes=10, 
+        #batch_normalization=True, 
+        #convolutional_layers=[32,64,128],
+        #kernels=[{"size": 5, "stride": 1, "padding": 0}, {"size": 3, "stride": 2, "padding": 2}, {"size": 5, "stride": 1, "padding": 2}],
+        #pooling=[{"size": 3, "stride": 2}, {"size": 2, "stride": 2}, {"size": 2, "stride": 2}]
+        )
     trainer = Trainer(
         batch_size,
         learning_rate,
