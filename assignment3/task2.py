@@ -2,10 +2,13 @@ import pathlib
 import matplotlib.pyplot as plt
 import torch
 import utils
-from torch import nn
+from torch import dropout, nn
 from dataloaders import load_cifar10
-from trainer import Trainer
+from trainer import Trainer, compute_loss_and_accuracy
 import numpy as np
+import json
+
+key = "drop_out"
 
 def new_shape_after_convolution_or_pooling(image_shape, kernel_size, stride, padding=0):
     dilation = 1
@@ -27,7 +30,10 @@ class ExampleModel(nn.Module):
                  pooling = [{"size": 2, "stride": 2}]*3,
                  input_image_shape=(32,32),
                  batch_normalization=False,
-                 activation_function=nn.ReLU()):          
+                 activation_function=nn.ReLU(),
+                 drop_out=0.0,
+                 avg_pool = False,
+                 ):          
         """
             Is called when model is initialized.
             Args:
@@ -56,8 +62,10 @@ class ExampleModel(nn.Module):
             image_shape = new_shape_after_convolution_or_pooling(image_shape, kernels[i]["size"], kernels[i]["stride"], kernels[i]["padding"])
             
             conv_layers.append(activation_function)
-            
-            conv_layers.append(nn.MaxPool2d(kernel_size=pooling[i]["size"], stride=pooling[i]["stride"]))
+            if avg_pool:
+                conv_layers.append(nn.AvgPool2d(kernel_size=pooling[i]["size"], stride=pooling[i]["stride"]))
+            else:
+                conv_layers.append(nn.MaxPool2d(kernel_size=pooling[i]["size"], stride=pooling[i]["stride"]))
 
 
             image_shape = new_shape_after_convolution_or_pooling(image_shape, pooling[i]["size"], pooling[i]["stride"])
@@ -73,10 +81,18 @@ class ExampleModel(nn.Module):
 
         hidden_layers = []
         num_input_nodes = num_flattened_nodes
+        if drop_out > 0:
+            hidden_layers.append(nn.Dropout(p=drop_out))
+        
         for num_nodes in hidden_linear_layers:
             hidden_layers.append(nn.Linear(num_input_nodes, num_nodes))
             hidden_layers.append(activation_function)
+          
+            if drop_out > 0:
+                hidden_layers.append(nn.Dropout(p=drop_out))
+
             num_input_nodes = num_nodes
+            
 
         self.num_output_features = num_flattened_nodes
         # Initialize our last fully connected layer
@@ -108,6 +124,14 @@ class ExampleModel(nn.Module):
 
 
 def create_plots(trainer: Trainer, name: str):
+    train_loss, train_accuracy = compute_loss_and_accuracy(trainer.dataloader_train, trainer.model, trainer.loss_criterion)
+    val_loss, val_accuracy = compute_loss_and_accuracy(trainer.dataloader_val, trainer.model, trainer.loss_criterion)
+    test_loss, test_accuracy = compute_loss_and_accuracy(trainer.dataloader_test, trainer.model, trainer.loss_criterion)
+    
+    print(f"Train: \n\tLoss: {train_loss}\n\tAccuracy: {train_accuracy}")
+    print(f"Validation: \n\tLoss: {val_loss}\n\tAccuracy: {val_accuracy}")
+    print(f"Test: \n\tLoss: {test_loss}\n\tAccuracy: {test_accuracy}")
+
     plot_path = pathlib.Path("plots")
     plot_path.mkdir(exist_ok=True)
     # Save plots and show them
@@ -129,7 +153,7 @@ def main():
     # Set the random generator seed (parameters, shuffling etc).
     # You can try to change this and check if you still get the same result! 
     utils.set_seed(0)
-    epochs = 10
+    epochs = 0
     batch_size = 64
     learning_rate = 5e-2
     early_stop_count = 4
@@ -137,10 +161,14 @@ def main():
     model = ExampleModel(
         image_channels=3, 
         num_classes=10, 
-        #batch_normalization=True, 
+        batch_normalization=True, 
+        drop_out=0.5,
+        #activation_function=nn.ELU(),
         #convolutional_layers=[32,64,128],
-        #kernels=[{"size": 5, "stride": 1, "padding": 0}, {"size": 3, "stride": 2, "padding": 2}, {"size": 5, "stride": 1, "padding": 2}],
-        #pooling=[{"size": 3, "stride": 2}, {"size": 2, "stride": 2}, {"size": 2, "stride": 2}]
+        #kernels=[{"size": 5, "stride": 1, "padding": 2}, {"size": 3, "stride": 1, "padding": 1}, {"size": 3, "stride": 1, "padding": 1}],
+        #pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
+        pooling=[{"size": 3, "stride": 2}, {"size":2, "stride": 2}, {"size": 2, "stride": 1}],
+        avg_pool=True,
         )
     trainer = Trainer(
         batch_size,
