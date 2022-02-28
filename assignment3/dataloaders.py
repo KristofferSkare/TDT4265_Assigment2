@@ -20,6 +20,7 @@ def load_cifar10(batch_size: int, validation_fraction: float = 0.1
                  ) -> typing.List[torch.utils.data.DataLoader]:
     # Note that transform train will apply the same transform for
     # validation!
+    num_workers = 0 # TODO: This was 2 before
     transform_train = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
@@ -50,17 +51,17 @@ def load_cifar10(batch_size: int, validation_fraction: float = 0.1
     dataloader_train = torch.utils.data.DataLoader(data_train,
                                                    sampler=train_sampler,
                                                    batch_size=batch_size,
-                                                   num_workers=2,
+                                                   num_workers=num_workers,
                                                    drop_last=True)
 
     dataloader_val = torch.utils.data.DataLoader(data_train,
                                                  sampler=validation_sampler,
                                                  batch_size=batch_size,
-                                                 num_workers=2)
+                                                 num_workers=num_workers)
 
     dataloader_test = torch.utils.data.DataLoader(data_test,
                                                   batch_size=batch_size,
                                                   shuffle=False,
-                                                  num_workers=2)
+                                                  num_workers=num_workers)
 
     return dataloader_train, dataloader_val, dataloader_test
