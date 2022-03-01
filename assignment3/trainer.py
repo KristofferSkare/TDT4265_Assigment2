@@ -47,7 +47,7 @@ def compute_loss_and_accuracy(
     # average_loss = np.mean(np.array(losses))
     average_loss = torch.mean(torch.tensor(losses))
 
-    return average_loss, accuracy
+    return average_loss.tolist(), accuracy.tolist()
 
 
 class Trainer:

@@ -124,13 +124,7 @@ class ExampleModel(nn.Module):
 
 
 def create_plots(trainer: Trainer, name: str):
-    train_loss, train_accuracy = compute_loss_and_accuracy(trainer.dataloader_train, trainer.model, trainer.loss_criterion)
-    val_loss, val_accuracy = compute_loss_and_accuracy(trainer.dataloader_val, trainer.model, trainer.loss_criterion)
-    test_loss, test_accuracy = compute_loss_and_accuracy(trainer.dataloader_test, trainer.model, trainer.loss_criterion)
-    
-    print(f"Train: \n\tLoss: {train_loss}\n\tAccuracy: {train_accuracy}")
-    print(f"Validation: \n\tLoss: {val_loss}\n\tAccuracy: {val_accuracy}")
-    print(f"Test: \n\tLoss: {test_loss}\n\tAccuracy: {test_accuracy}")
+
 
     plot_path = pathlib.Path("plots")
     plot_path.mkdir(exist_ok=True)
@@ -179,6 +173,30 @@ def main():
         dataloaders
     )
     trainer.train()
+
+
+    train_loss, train_accuracy = compute_loss_and_accuracy(trainer.dataloader_train, trainer.model, trainer.loss_criterion)
+    val_loss, val_accuracy = compute_loss_and_accuracy(trainer.dataloader_val, trainer.model, trainer.loss_criterion)
+    test_loss, test_accuracy = compute_loss_and_accuracy(trainer.dataloader_test, trainer.model, trainer.loss_criterion)
+    
+    print(f"Train: \n\tLoss: {train_loss}\n\tAccuracy: {train_accuracy}")
+    print(f"Validation: \n\tLoss: {val_loss}\n\tAccuracy: {val_accuracy}")
+    print(f"Test: \n\tLoss: {test_loss}\n\tAccuracy: {test_accuracy}")
+
+
+    data = {}
+    with open("models.json", "r") as file:
+        data = json.load(file)
+    
+    data[key] = {
+        "train": {"loss": train_loss, "acc": train_accuracy, "history": trainer.train_history},
+        "validation": {"loss": val_loss, "acc": val_accuracy, "history": trainer.validation_history},
+        "test": {"loss": test_loss, "acc": test_accuracy}
+    }
+
+    with open("models.json", "w") as file:
+        json.dump(data, file)
+
     create_plots(trainer, "task3_1")
 
 if __name__ == "__main__":
