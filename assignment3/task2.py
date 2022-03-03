@@ -8,7 +8,7 @@ from trainer import Trainer, compute_loss_and_accuracy
 import numpy as np
 import json
 
-key = "drop_out_4"
+key = "tryhard"
 
 def new_shape_after_convolution_or_pooling(image_shape, kernel_size, stride, padding=0):
     dilation = 1
@@ -164,9 +164,9 @@ def main():
         drop_out=0.4,
         #activation_function=nn.ELU(),
         #hidden_linear_layers=[64],
-        #convolutional_layers=[32,64,128],
-        #kernels=[{"size": 5, "stride": 1, "padding": 2}, {"size": 5, "stride": 1, "padding": 2}, {"size": 3, "stride": 1, "padding": 1}],
-        #pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
+        convolutional_layers=[64,128,256],
+        kernels=[{"size": 3, "stride": 1, "padding": 1}, {"size": 3, "stride": 1, "padding": 1}, {"size": 3, "stride": 1, "padding": 1}],
+        pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
         #pooling=[{"size": 2, "stride": 2}, {"size":2, "stride": 2}, {"size": 2, "stride": 1}],
         #avg_pool=True,
         )
@@ -204,7 +204,7 @@ def main():
     with open("models.json", "w") as file:
         json.dump(data, file)
 
-    create_plots(trainer, "task3_1")
+    create_plots(trainer, "tryhard")
 
 if __name__ == "__main__":
     main()
