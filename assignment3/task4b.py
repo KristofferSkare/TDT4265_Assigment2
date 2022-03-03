@@ -69,7 +69,7 @@ def task4c():
     activation = image
     for i in range(len(layers) - 2):
         activation = layers[i](activation)
-        
+
     print("Activation shape:", activation.shape)
 
     indices = [0,1,2,3,4,5,6,7,8,9]
@@ -81,4 +81,5 @@ def task4c():
         plt.suptitle("Activation for filter " + str(i))
         plt.savefig("task4c_" + str(i)+".png")
 
-task4c()
+#task4b()
+#task4c()
