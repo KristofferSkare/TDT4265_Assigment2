@@ -8,7 +8,7 @@ from trainer import Trainer, compute_loss_and_accuracy
 import numpy as np
 import json
 
-key = "drop_out_3"
+key = "drop_out_4"
 
 def new_shape_after_convolution_or_pooling(image_shape, kernel_size, stride, padding=0):
     dilation = 1
@@ -163,8 +163,8 @@ def main():
         batch_normalization=True, 
         drop_out=0.4,
         #activation_function=nn.ELU(),
-        hidden_linear_layers=[128],
-        convolutional_layers=[32,64,256],
+        #hidden_linear_layers=[64],
+        #convolutional_layers=[32,64,128],
         #kernels=[{"size": 5, "stride": 1, "padding": 2}, {"size": 5, "stride": 1, "padding": 2}, {"size": 3, "stride": 1, "padding": 1}],
         #pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
         #pooling=[{"size": 2, "stride": 2}, {"size":2, "stride": 2}, {"size": 2, "stride": 1}],
