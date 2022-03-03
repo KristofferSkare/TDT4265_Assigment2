@@ -8,7 +8,7 @@ from trainer import Trainer, compute_loss_and_accuracy
 import numpy as np
 import json
 
-key = "drop_out_4"
+key = "drop_out_432_256"
 
 def new_shape_after_convolution_or_pooling(image_shape, kernel_size, stride, padding=0):
     dilation = 1
@@ -149,7 +149,7 @@ def create_plots(trainer: Trainer, name: str):
 def main():
     # Set the random generator seed (parameters, shuffling etc).
     # You can try to change this and check if you still get the same result! 
-    utils.set_seed(0)
+    utils.set_seed(528)
     epochs = 10
     batch_size = 64
     weight_decay = 2e-5
@@ -163,10 +163,10 @@ def main():
         batch_normalization=True, 
         drop_out=0.4,
         #activation_function=nn.ELU(),
-        #hidden_linear_layers=[64],
-        #convolutional_layers=[32,64,128],
+        #hidden_linear_layers=[128],
+        #convolutional_layers=[32,64,256],
         #kernels=[{"size": 5, "stride": 1, "padding": 2}, {"size": 5, "stride": 1, "padding": 2}, {"size": 3, "stride": 1, "padding": 1}],
-        #pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
+        pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
         #pooling=[{"size": 2, "stride": 2}, {"size":2, "stride": 2}, {"size": 2, "stride": 1}],
         #avg_pool=True,
         )
