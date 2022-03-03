@@ -8,7 +8,7 @@ from trainer import Trainer, compute_loss_and_accuracy
 import numpy as np
 import json
 
-key = "drop_out"
+key = "drop_out_3"
 
 def new_shape_after_convolution_or_pooling(image_shape, kernel_size, stride, padding=0):
     dilation = 1
@@ -50,15 +50,16 @@ class ExampleModel(nn.Module):
 
         conv_layers = []
         for i, num_filters in enumerate(convolutional_layers):
-            conv_layers.append(
-                nn.Conv2d(
+            conv_layer =  nn.Conv2d(
                     in_channels=layer_depth,
                     out_channels=num_filters,
                     kernel_size=kernels[i]["size"],
                     stride=kernels[i]["stride"],
                     padding=kernels[i]["padding"]
                 )
-            )
+           
+            conv_layers.append(conv_layer)
+
             image_shape = new_shape_after_convolution_or_pooling(image_shape, kernels[i]["size"], kernels[i]["stride"], kernels[i]["padding"])
             
             conv_layers.append(activation_function)
@@ -85,7 +86,8 @@ class ExampleModel(nn.Module):
             hidden_layers.append(nn.Dropout(p=drop_out))
         
         for num_nodes in hidden_linear_layers:
-            hidden_layers.append(nn.Linear(num_input_nodes, num_nodes))
+            layer = nn.Linear(num_input_nodes, num_nodes)
+            hidden_layers.append(layer)
             hidden_layers.append(activation_function)
           
             if drop_out > 0:
@@ -100,10 +102,11 @@ class ExampleModel(nn.Module):
         # Outputs num_classes predictions, 1 for each class.
         # There is no need for softmax activation function, as this is
         # included with nn.CrossEntropyLoss
+        last_layer =  nn.Linear(hidden_linear_layers[-1], num_classes)
         self.classifier = nn.Sequential(
             nn.Flatten(start_dim=1),
             *hidden_layers, 
-            nn.Linear(hidden_linear_layers[-1], num_classes)
+            last_layer
         )
 
     def forward(self, x):
@@ -149,20 +152,23 @@ def main():
     utils.set_seed(0)
     epochs = 10
     batch_size = 64
-    learning_rate = 5e-2
-    early_stop_count = 4
+    weight_decay = 2e-5
+    #learning_rate = 5e-2
+    learning_rate = 7e-4
+    early_stop_count = 6
     dataloaders = load_cifar10(batch_size)
     model = ExampleModel(
         image_channels=3, 
         num_classes=10, 
         batch_normalization=True, 
-        drop_out=0.5,
+        drop_out=0.4,
         #activation_function=nn.ELU(),
-        #convolutional_layers=[32,64,128],
-        #kernels=[{"size": 5, "stride": 1, "padding": 2}, {"size": 3, "stride": 1, "padding": 1}, {"size": 3, "stride": 1, "padding": 1}],
+        hidden_linear_layers=[128],
+        convolutional_layers=[32,64,256],
+        #kernels=[{"size": 5, "stride": 1, "padding": 2}, {"size": 5, "stride": 1, "padding": 2}, {"size": 3, "stride": 1, "padding": 1}],
         #pooling=[{"size": 4, "stride": 2}, {"size":3, "stride": 2}, {"size": 2, "stride": 2}]
-        pooling=[{"size": 3, "stride": 2}, {"size":2, "stride": 2}, {"size": 2, "stride": 1}],
-        avg_pool=True,
+        #pooling=[{"size": 2, "stride": 2}, {"size":2, "stride": 2}, {"size": 2, "stride": 1}],
+        #avg_pool=True,
         )
     trainer = Trainer(
         batch_size,
@@ -170,10 +176,11 @@ def main():
         early_stop_count,
         epochs,
         model,
-        dataloaders
+        dataloaders,
+        weight_decay=weight_decay,
     )
     trainer.train()
-
+    trainer.model.eval()
 
     train_loss, train_accuracy = compute_loss_and_accuracy(trainer.dataloader_train, trainer.model, trainer.loss_criterion)
     val_loss, val_accuracy = compute_loss_and_accuracy(trainer.dataloader_val, trainer.model, trainer.loss_criterion)

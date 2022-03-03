@@ -58,7 +58,9 @@ class Trainer:
                  early_stop_count: int,
                  epochs: int,
                  model: torch.nn.Module,
-                 dataloaders: typing.List[torch.utils.data.DataLoader]):
+                 dataloaders: typing.List[torch.utils.data.DataLoader],
+                 weight_decay=0,
+                 ):
         """
             Initialize our trainer class.
         """
@@ -78,9 +80,9 @@ class Trainer:
         # Define our optimizer. SGD = Stochastich Gradient Descent
         # TODO: test out different optim?
         # TODO: Test with L2-reg (weight decay) and momentum
-        self.optimizer = torch.optim.SGD(self.model.parameters(),
-                                         self.learning_rate, momentum=0, weight_decay=0)
-
+        #self.optimizer = torch.optim.SGD(self.model.parameters(),
+        #                                 self.learning_rate, momentum=0.2, weight_decay=0)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), self.learning_rate, weight_decay=weight_decay)
         # Load our dataset
         self.dataloader_train, self.dataloader_val, self.dataloader_test = dataloaders
 
