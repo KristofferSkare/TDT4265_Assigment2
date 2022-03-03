@@ -7,6 +7,7 @@ image = Image.open("images/zebra.jpg")
 print("Image shape:", image.size)
 
 model = torchvision.models.resnet18(pretrained=True)
+model.eval()
 print(model)
 first_conv_layer = model.conv1
 print("First conv layer weight shape:", first_conv_layer.weight.shape)
@@ -21,8 +22,7 @@ image_transform = torchvision.transforms.Compose([
 image = image_transform(image)[None]
 print("Image shape:", image.shape)
 
-activation = first_conv_layer(image)
-print("Activation shape:", activation.shape)
+
 
 
 def torch_image_to_numpy(image: torch.Tensor):
@@ -44,5 +44,42 @@ def torch_image_to_numpy(image: torch.Tensor):
     image = np.moveaxis(image, 0, 2)
     return image
 
+def task4b():
+    activation = first_conv_layer(image)
+    print("Activation shape:", activation.shape)
 
-indices = [14, 26, 32, 49, 52]
+    indices = [14, 26, 32, 49, 52]
+
+    for i in indices:
+        kernel =  torch_image_to_numpy(first_conv_layer.weight[i])
+        np_image = torch_image_to_numpy(activation[0][i])
+        plt.clf()
+        plt.subplot(1,2,1)
+        plt.title("Kernel")
+        plt.imshow(kernel)
+        plt.subplot(1,2,2)
+        plt.title("Activation")
+        plt.imshow(np_image, cmap="gray")
+        plt.suptitle("Kernel and activation for index " + str(i))
+        plt.savefig("task4b_" + str(i)+".png")
+
+def task4c():
+    layers =  list(model.children())
+    print(layers)
+    activation = image
+    for i in range(len(layers) - 2):
+        activation = layers[i](activation)
+
+    print("Activation shape:", activation.shape)
+
+    indices = [0,1,2,3,4,5,6,7,8,9]
+
+    for i in indices:
+        np_image = torch_image_to_numpy(activation[0][i])
+        plt.clf()
+        plt.imshow(np_image, cmap="gray")
+        plt.suptitle("Activation for filter " + str(i))
+        plt.savefig("task4c_" + str(i)+".png")
+
+#task4b()
+#task4c()

@@ -149,7 +149,7 @@ def create_plots(trainer: Trainer, name: str):
 def main():
     # Set the random generator seed (parameters, shuffling etc).
     # You can try to change this and check if you still get the same result! 
-    utils.set_seed(0)
+    utils.set_seed(528)
     epochs = 10
     batch_size = 64
     weight_decay = 2e-5
