@@ -13107,26 +13107,26 @@ div#notebook {
 <h2 id="task-1a)">task 1a)<a class="anchor-link" href="#task-1a)">&#182;</a></h2><p>Assuming that by convolution the task means the operation that happens in a convolutional layer in forward pass. Also to have the result be 3x5 (same as input image) we zero pad the image with one row/column.</p>
 <p><img src="convolution_by_hand.jpg" alt="convolution by hand"></p>
 <p>Show work on the first column:</p>
-<p>(0,0):   $   1 \cdot 0 + 0 \cdot 2 + 3 \cdot 0 + 2 \cdot 1 = 2    $</p>
-<p>(1,0):   $   1 \cdot 0 + 0 \cdot 1 + 3 \cdot 0 + 2 \cdot 2  + 0 \cdot 0 + 6 \cdot 1 = 10  $</p>
-<p>(2,0):  $  3 \cdot 0 + 2 \cdot 1 +  0 \cdot 0 + 6 \cdot 2 = 14  $</p>
+<p>(0,0): $ 1 \cdot 0 + 0 \cdot 2 + 3 \cdot 0 + 2 \cdot 1 = 2$</p>
+<p>(1,0): $ 1 \cdot 0 + 0 \cdot 1 + 3 \cdot 0 + 2 \cdot 2  + 0 \cdot 0 + 6 \cdot 1 = 10$</p>
+<p>(2,0): $ 3 \cdot 0 + 2 \cdot 1 +  0 \cdot 0 + 6 \cdot 2 = 14$</p>
 <h2 id="task-1b)">task 1b)<a class="anchor-link" href="#task-1b)">&#182;</a></h2><p>The convolutional layer reduces sensitivity to translations in the image.</p>
 <h2 id="task-1c)">task 1c)<a class="anchor-link" href="#task-1c)">&#182;</a></h2><p>We need 2 rows and columns of zero padding on each side since this will make the center of the kernel be able to be placed at the edge of the image, but no further. This also depends on stride (which is  1 in this case).</p>
-<h2 id="task-1d)">task 1d)<a class="anchor-link" href="#task-1d)">&#182;</a></h2><p>The kernel is of size (  $   9\times 9   $  ) since it reduces the spacial dimension by 8.</p>
-<h2 id="task-1e)">task 1e)<a class="anchor-link" href="#task-1e)">&#182;</a></h2><p>Pooling with neighborhood of (  $   2\times 2  $ ) and stride of 2 will half the width and height. Therefore the dimension of the pooled feature maps ( $  252 \times 252  $ ).</p>
-<h2 id="task-1f)">task 1f)<a class="anchor-link" href="#task-1f)">&#182;</a></h2><p>Convolution with  $ 3 \times 3 $  kernel with stride of 1 and no padding will reduce the dimension by 2. Therefore the resulting spacial dimension is  ( $ 250 \times 250 $ ).</p>
-<h2 id="task-1g)">task 1g)<a class="anchor-link" href="#task-1g)">&#182;</a></h2><p>Input to first layer ( $ 32 \times 32 \times 3 $ )
-There are  $ 32 $  nodes that each has  $ 3 $   $ 5\times 5 $  kernels. This gives  $ 32 \cdot 3 \cdot 5 \cdot 5 = 2400 $  parameters in the first layer. 
+<h2 id="task-1d)">task 1d)<a class="anchor-link" href="#task-1d)">&#182;</a></h2><p>The kernel is of size ($9\times 9$) since it reduces the spacial dimension by 8.</p>
+<h2 id="task-1e)">task 1e)<a class="anchor-link" href="#task-1e)">&#182;</a></h2><p>Pooling with neighborhood of ($2\times 2$) and stride of 2 will half the width and height. Therefore the dimension of the pooled feature maps ($252 \times 252$).</p>
+<h2 id="task-1f)">task 1f)<a class="anchor-link" href="#task-1f)">&#182;</a></h2><p>Convolution with $3 \times 3$ kernel with stride of 1 and no padding will reduce the dimension by 2. Therefore the resulting spacial dimension is  ($250 \times 250$).</p>
+<h2 id="task-1g)">task 1g)<a class="anchor-link" href="#task-1g)">&#182;</a></h2><p>Input to first layer ($32 \times 32 \times 3$)
+There are $32$ nodes that each has $3$ $5\times 5$ kernels. This gives $32 \cdot 3 \cdot 5 \cdot 5 = 2400$ parameters in the first layer. 
 The max pooling will half the width and height and the convolution will not affect the dimension.</p>
-<p>Input to second layer ( $ 16 \times 16 \times 32 $ )
-There are  $ 64 $  nodes that each has  $ 32 $   $ 5\times 5 $  kernels. This gives  $ 64 \cdot 32 \cdot 5 \cdot 5 = 51200 $  parameters in the second layer. 
+<p>Input to second layer ($16 \times 16 \times 32$)
+There are $64$ nodes that each has $32$ $5\times 5$ kernels. This gives $64 \cdot 32 \cdot 5 \cdot 5 = 51200$ parameters in the second layer. 
 The max pooling will half the width and height and the convolution will not affect the dimension.</p>
-<p>Input to third layer ( $ 8 \times 8 \times 64 $ )
-There are  $ 128 $  nodes that each has  $ 64 $   $ 5\times 5 $  kernels. This gives  $ 128 \cdot 64 \cdot 5 \cdot 5 = 204800 $  parameters in the third layer. 
+<p>Input to third layer ($8 \times 8 \times 64$)
+There are $128$ nodes that each has $64$ $5\times 5$ kernels. This gives $128 \cdot 64 \cdot 5 \cdot 5 = 204800$ parameters in the third layer. 
 The max pooling will half the width and height and the convolution will not affect the dimension.</p>
-<p>Before flattening the dimension is ( $ 4 \times 4 \times 128 $ ). This gives  $ 4 \cdot 4 \cdot 128 = 2048 $  input nodes in the fully-connected layers.</p>
-<p>Fully connected number of weights and biases:  $ (2048 + 1) \cdot 64 + (64 + 1) \cdot 10 = 131786 $</p>
-<p>In total:  $ 2400 + 51200 + 204800 + 131786 = 390186 $</p>
+<p>Before flattening the dimension is ($4 \times 4 \times 128$). This gives $4 \cdot 4 \cdot 128 = 2048$ input nodes in the fully-connected layers.</p>
+<p>Fully connected number of weights and biases: $(2048 + 1) \cdot 64 + (64 + 1) \cdot 10 = 131786$</p>
+<p>In total: $2400 + 51200 + 204800 + 131786 = 390186$</p>
 
 </div>
 </div>
@@ -13557,6 +13557,19 @@ The last kernel (52) seems to be detecting green/yellow in the same way that ker
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
     </div>
   </div>
