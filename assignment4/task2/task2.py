@@ -15,12 +15,33 @@ def calculate_iou(prediction_box, gt_box):
         returns:
             float: value of the intersection of union for the two boxes.
     """
-    # YOUR CODE HERE
 
     # Compute intersection
+    x_min = np.min([gt_box[0], prediction_box[0]])
+    x_max = np.max([gt_box[2], prediction_box[2]])
 
+    delta_x_gt = gt_box[2] - gt_box[0]
+    delta_x_pred = prediction_box[2] - prediction_box[0]
+
+    y_min = np.min([gt_box[1], prediction_box[1]])
+    y_max = np.max([gt_box[3], prediction_box[3]])
+
+    
+    delta_y_gt = gt_box[3] - gt_box[1]
+    delta_y_pred = prediction_box[3] - prediction_box[1]
+
+    x_intersection = delta_x_gt +  delta_x_pred - (x_max - x_min)
+    y_intersection = delta_y_gt +  delta_y_pred - (y_max - y_min)
+    
+    if x_intersection <=0 or y_intersection <=0:
+        return 0
+
+    intersection = x_intersection * y_intersection
     # Compute union
-    iou = 0
+    union = delta_x_gt * delta_y_gt + delta_x_pred * delta_y_pred - intersection
+
+    iou = intersection/union
+
     assert iou >= 0 and iou <= 1
     return iou
 
