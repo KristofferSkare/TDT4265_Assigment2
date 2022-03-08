@@ -32,7 +32,7 @@ def calculate_iou(prediction_box, gt_box):
 
     x_intersection = delta_x_gt +  delta_x_pred - (x_max - x_min)
     y_intersection = delta_y_gt +  delta_y_pred - (y_max - y_min)
-    
+
     if x_intersection <=0 or y_intersection <=0:
         return 0
 
@@ -57,8 +57,10 @@ def calculate_precision(num_tp, num_fp, num_fn):
     Returns:
         float: value of precision
     """
-    raise NotImplementedError
+    if num_tp + num_fp == 0:
+        return 1
 
+    return num_tp/(num_tp + num_fp)
 
 def calculate_recall(num_tp, num_fp, num_fn):
     """ Calculates the recall for the given parameters.
@@ -70,7 +72,10 @@ def calculate_recall(num_tp, num_fp, num_fn):
     Returns:
         float: value of recall
     """
-    raise NotImplementedError
+    if num_tp + num_fn == 0:
+        return 0
+
+    return num_tp/(num_tp + num_fn)
 
 
 def get_all_box_matches(prediction_boxes, gt_boxes, iou_threshold):
