@@ -72,7 +72,13 @@ class BasicModel(torch.nn.Module):
             ],
         ]
 
-        self.feature_extractors = [nn.Sequential(*block).cuda() for block in blocks]
+        feature_extractors = []
+        line = []
+        for block in blocks:
+            line = [*line, *block]
+            feature_extractors.append(nn.Sequential(*line).cuda())
+        self.feature_extractors = feature_extractors
+            
 
         
 
@@ -90,11 +96,9 @@ class BasicModel(torch.nn.Module):
             shape(-1, output_channels[0], 38, 38),
         """
         out_features = []
-        prev_output = x
         for block in self.feature_extractors:
-            output = block(prev_output)
+            output = block(x)
             out_features.append(output)
-            prev_output = output
        
         for idx, feature in enumerate(out_features):
             out_channel = self.out_channels[idx]
