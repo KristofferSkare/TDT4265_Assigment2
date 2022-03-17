@@ -21,9 +21,7 @@ class BasicModel(torch.nn.Module):
         super().__init__()
         self.out_channels = output_channels
         self.output_feature_shape = output_feature_sizes
-
-        blocks = [
-            [
+        block0 = [
                 nn.Conv2d(in_channels=image_channels, out_channels=32, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=2, stride=2),
@@ -34,52 +32,52 @@ class BasicModel(torch.nn.Module):
                 nn.ReLU(),
                 nn.Conv2d(in_channels=64, out_channels=output_channels[0], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ],
-            [
+            ]
+        block1 = [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[0], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[1], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ],
-            [
+            ]
+
+        block2 = [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[1], out_channels=256, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=256, out_channels=output_channels[2], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ],
-            [
+            ]
+        block3 = [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[2], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[3], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ],
-            [
+            ]
+        block4 = [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[3], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[4], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ],
-            [
+            ]
+        block5 = [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[4], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[5], kernel_size=3, stride=1, padding=0),
                 nn.ReLU(),
-            ],
         ]
 
-        feature_extractors = []
-        line = []
-        for block in blocks:
-            for f in block:
-                line.append(f)
-            feature_extractors.append(nn.Sequential(*line).cuda())
-        self.feature_extractors = feature_extractors
-            
+        self.feature_extractors = nn.ModuleList([
+            nn.Sequential(*block0),
+            nn.Sequential(*block0, *block1),
+            nn.Sequential(*block0, *block1, *block2),
+            nn.Sequential(*block0, *block1, *block2, *block3),
+             nn.Sequential(*block0, *block1, *block2, *block3, *block4),
+              nn.Sequential(*block0, *block1, *block2, *block3, *block4, *block5),
+            ])
 
         
 
