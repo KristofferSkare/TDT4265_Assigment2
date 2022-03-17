@@ -75,7 +75,8 @@ class BasicModel(torch.nn.Module):
         feature_extractors = []
         line = []
         for block in blocks:
-            line = [*line, *block]
+            for f in block:
+                line.append(f)
             feature_extractors.append(nn.Sequential(*line).cuda())
         self.feature_extractors = feature_extractors
             
