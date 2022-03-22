@@ -24,7 +24,7 @@ def train_epoch(
         batch = tops.to_cuda(batch)
         batch["labels"] = batch["labels"].long()
         batch = gpu_transform(batch)
-
+        
         with torch.cuda.amp.autocast(enabled=tops.AMP()):
             bbox_delta, confs = model(batch["image"])
             loss, to_log = model.loss_func(bbox_delta, confs, batch["boxes"], batch["labels"])
@@ -80,7 +80,7 @@ def train(config_path: Path, evaluate_only: bool):
         evaluation_fn()
         exit()
     scaler = torch.cuda.amp.GradScaler(enabled=tops.AMP())
-    dummy_input = tops.to_cuda(torch.randn(1, cfg.train.image_channels, *cfg.train.imshape))
+    dummy_input = tops.to_cuda(torch.randn(32, cfg.train.image_channels, *cfg.train.imshape))
     tops.print_module_summary(model, (dummy_input,))
     start_epoch = logger.epoch()
     for epoch in range(start_epoch, cfg.train.epochs):
