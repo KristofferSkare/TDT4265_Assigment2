@@ -22,7 +22,7 @@ class BasicModel(torch.nn.Module):
         self.out_channels = output_channels
         self.output_feature_shape = output_feature_sizes
 
-        blocks = nn.ModuleList([
+        blocks = [
             [
                 nn.Conv2d(in_channels=image_channels, out_channels=32, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
@@ -70,7 +70,7 @@ class BasicModel(torch.nn.Module):
                 nn.Conv2d(in_channels=128, out_channels=output_channels[5], kernel_size=3, stride=1, padding=0),
                 nn.ReLU(),
             ],
-        ])
+        ]
 
         feature_extractors = []
         line = []
@@ -78,7 +78,7 @@ class BasicModel(torch.nn.Module):
             for f in block:
                 line.append(f)
             feature_extractors.append(nn.Sequential(*line))
-        self.feature_extractors = feature_extractors
+        self.feature_extractors = nn.ModuleList(feature_extractors)
 
             
 
