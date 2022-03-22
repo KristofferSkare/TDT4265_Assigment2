@@ -49,7 +49,7 @@ model = L(SSD300)(
 
 optimizer = L(torch.optim.Adam)(
     # Tip: Scale the learning rate by batch size! 2.6e-3 is set for a batch size of 32. use 2*2.6e-3 if you use 64
-    lr=1e-4, weight_decay=0.0005
+    lr=1e-3, weight_decay=0.0005
 )
 schedulers = dict(
     linear=L(LinearLR)(start_factor=0.1, end_factor=1, total_iters=500),
