@@ -34,38 +34,36 @@ class BasicModel(torch.nn.Module):
                 nn.ReLU(),
                 nn.Conv2d(in_channels=64, out_channels=output_channels[0], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ]
-            
-        block1 = [
+            ],
+            [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[0], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[1], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ]
-
-        block2 = [
+            ],
+            [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[1], out_channels=256, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=256, out_channels=output_channels[2], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ]
-        block3 = [
+            ],
+            [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[2], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[3], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ]
-        block4 = [
+            ],
+            [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[3], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[4], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
-            ]
-        block5 = [
+            ],
+            [
                 nn.ReLU(),
                 nn.Conv2d(in_channels=output_channels[4], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
