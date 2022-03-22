@@ -26,12 +26,12 @@ class BasicModel(torch.nn.Module):
             [
                 nn.Conv2d(in_channels=image_channels, out_channels=32, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
-                nn.BatchNorm2d(32),
                 nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.BatchNorm2d(32),
                 nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
-                nn.BatchNorm2d(64),
                 nn.MaxPool2d(kernel_size=2, stride=2),
+                nn.BatchNorm2d(64),
                 nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
                 nn.BatchNorm2d(128),
@@ -42,6 +42,7 @@ class BasicModel(torch.nn.Module):
             [
                 nn.Conv2d(in_channels=output_channels[0], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
+                nn.BatchNorm2d(128),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[1], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
                 nn.BatchNorm2d(output_channels[1]),
@@ -49,6 +50,7 @@ class BasicModel(torch.nn.Module):
             [
                 nn.Conv2d(in_channels=output_channels[1], out_channels=256, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
+                nn.BatchNorm2d(256),
                 nn.Conv2d(in_channels=256, out_channels=output_channels[2], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
                 nn.BatchNorm2d(output_channels[2]),
@@ -56,6 +58,7 @@ class BasicModel(torch.nn.Module):
             [
                 nn.Conv2d(in_channels=output_channels[2], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
+                nn.BatchNorm2d(128),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[3], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
                 nn.BatchNorm2d(output_channels[3]),
@@ -63,6 +66,7 @@ class BasicModel(torch.nn.Module):
             [
                 nn.Conv2d(in_channels=output_channels[3], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
+                nn.BatchNorm2d(128),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[4], kernel_size=3, stride=2, padding=1),
                 nn.ReLU(),
                 nn.BatchNorm2d(output_channels[4]),
@@ -70,6 +74,7 @@ class BasicModel(torch.nn.Module):
             [
                 nn.Conv2d(in_channels=output_channels[4], out_channels=128, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
+                nn.BatchNorm2d(128),
                 nn.Conv2d(in_channels=128, out_channels=output_channels[5], kernel_size=3, stride=1, padding=0),
                 nn.ReLU(),
                 nn.BatchNorm2d(output_channels[5]),
