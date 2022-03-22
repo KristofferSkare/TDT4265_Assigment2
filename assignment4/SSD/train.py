@@ -98,7 +98,7 @@ def train(config_path: Path, evaluate_only: bool):
         evaluation_fn()
         exit()
     scaler = torch.cuda.amp.GradScaler(enabled=tops.AMP())
-    dummy_input = tops.to_cuda(torch.randn(32, cfg.train.image_channels, *cfg.train.imshape))
+    dummy_input = tops.to_cuda(torch.randn(2, cfg.train.image_channels, *cfg.train.imshape))
     tops.print_module_summary(model, (dummy_input,))
     start_epoch = logger.epoch()
     for epoch in range(start_epoch, cfg.train.epochs):
