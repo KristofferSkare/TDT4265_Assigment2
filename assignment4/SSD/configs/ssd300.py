@@ -41,7 +41,7 @@ backbone = L(backbones.BasicModel)(
     output_feature_sizes="${anchors.feature_sizes}"
 )
 
-loss_objective = L(SSDMultiboxLoss)(anchors="${anchors}")
+#loss_objective = L(SSDMultiboxLoss)(anchors="${anchors}")
 
 model = L(SSD300)(
     feature_extractor=backbone,
